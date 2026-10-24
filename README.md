@@ -4,7 +4,7 @@
 
 A two-character podcast scene studio: edit, import or draft a script with Workers AI, direct each line with Fish Drama 3, and let the audience choose the ending.
 
-**Live deployment:** _Coming soon — replace this placeholder with the deployed HTTPS URL._
+**Live demo:** [sonaraudio.vercel.app](https://sonaraudio.vercel.app/)
 
 **Repository:** [mukulpythondev/sonaraudio](https://github.com/mukulpythondev/sonaraudio)
 
