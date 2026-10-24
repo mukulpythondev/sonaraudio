@@ -8,7 +8,7 @@ export function SceneSet({ environment, activeSpeaker, rehearsal }: {
   const setting = ENVIRONMENTS.find((item) => item.id === environment);
   return (
     <section className={`performance-set set-${environment}`} aria-label={`${setting?.name} visual set with Akshat and Priyanshu`}>
-      <div className="set-heading"><span>THE SET / {setting?.name}</span><span>{rehearsal ? "BROWSER REHEARSAL" : "DRAMA 3 PERFORMANCE"}</span></div>
+      <div className="set-heading"><span>THE SET / {setting?.name}</span><span>{rehearsal ? "BROWSER REHEARSAL" : "FISH AUDIO VOICES"}</span></div>
       <svg className="set-art" viewBox="0 0 1000 350" aria-hidden="true" focusable="false">
         <rect width="1000" height="350" fill="var(--set-wall)" />
         {environment === "studio" && <g>

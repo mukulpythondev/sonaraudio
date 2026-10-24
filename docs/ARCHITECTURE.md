@@ -2,7 +2,7 @@
 
 ## Current scene-studio architecture
 
-The homepage is now SonarAudio Scenes. The earlier phrase studio remains at `/phrase-studio`; the phrase-specific details below describe that retained feature.
+The homepage is SonarAudio Scenes. The earlier `/phrase-studio` URL redirects to `/`; phrase-specific details below document historical implementation files, not a second active product page. Existing browser favorites are not deleted.
 
 ```text
 Local labeled text -> bounded parser -> review -> replace opening
@@ -43,7 +43,7 @@ Next.js App Router + React + TypeScript. Tailwind v4 is loaded through PostCSS; 
 
 ## Visual direction
 
-The studio redesign applies the local UI/UX Pro Max skill used by HydroSense. Its search recommendations were adapted to a working communication tool rather than copied as a scroll-driven marketing page.
+The scene studio now uses a restrained product workspace: neutral surfaces, indigo actions, sans-serif typography, bordered editing panels, a side-by-side direction/set stage, and a dark audio preview. It claims no accelerator affiliation. Styles are scoped to the scene studio; the historical phrase-specific visual notes below describe the earlier prototype.
 
 - Warm paper, charcoal listening panel, and a single rust accent.
 - Editorial serif headlines paired with system UI text and monospace section labels; no external font requests.

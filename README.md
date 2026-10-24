@@ -14,6 +14,10 @@ A two-character podcast scene studio: edit, import or draft a script with Worker
 
 Actual local UI captures; these images demonstrate the interface, not audio quality.
 
+![Four script starting points with direct text input](docs/screenshots/script-inputs.png)
+
+The illustrated-set captures below predate the latest workspace redesign.
+
 ![Podcast studio with Akshat and Priyanshu](docs/screenshots/studio-set.png)
 
 | Corner cafe | After dark |
@@ -22,7 +26,7 @@ Actual local UI captures; these images demonstrate the interface, not audio qual
 
 The illustrated cast is **Akshat (Voice A)** and **Priyanshu (Voice B)**. Each setting has its own original vector set: acoustic panels and boom microphones in the studio, a café table/window, or an outdoor campfire with stand microphones. A current-turn marker follows the playback sequence; it is not an audio-level meter. Names are character labels, not verified identities of the configured voices.
 
-Formerly BolBhaav. The folder name is retained to avoid breaking local setup. The earlier communication-board prototype remains at `/phrase-studio`, with its existing favorites intact.
+Formerly BolBhaav. The folder name is retained to avoid breaking local setup. The earlier `/phrase-studio` URL now redirects to the main studio. Its saved browser favorites are left untouched; the old phrase page is no longer exposed.
 
 ## Start
 
@@ -43,7 +47,7 @@ sonaraudio/                 # Repository root; local checkout may still be named
   src/
     app/                   # Next.js pages and server-only API routes
       api/                 # Script drafting, Fish speech, disabled transcription route
-      phrase-studio/       # Retained phrase composer
+      phrase-studio/       # Compatibility redirect to the main studio
     components/            # Scene editor, illustrated sets, import interfaces
     lib/                   # Validation, script parsing, provider configuration
   tests/                   # Vitest contracts and mocked provider tests
@@ -88,6 +92,10 @@ When either Cloudflare credential is configured, **Workers AI takes precedence**
 - **Audio import is unavailable in this build.** Cloudflare documents Nova-3 diarization, but the public REST transport for binary audio plus diarization options could not be verified. The UI explains the limitation and disables upload; no paid transcription requests are guessed. Transcript parsing and speaker-mapping helpers are tested scaffolding, not a working transcription feature.
 
 ## Implemented workflow
+
+The creator workspace provides direct Script/Preview navigation, a live opening-line summary, import entry point, and a compact three-step workflow. Provider diagnostics and unavailable audio-import controls remain accessible in expandable details rather than competing with the core editing actions.
+
+Script setup comes before visual settings and has four mutually exclusive starting points: **Write or paste**, **Upload a script**, **Generate with AI**, or **Try an example**. Write/Paste is the default and uses the same local labeled-script parser as text upload. Switching panels never replaces the current script; only an explicit confirmed paste/import, successful generation, or confirmed example load does. Fish Audio is the default when configured; browser rehearsal is an optional fallback under Playback settings, always labeled when active. Entry, panel and hover animations respect reduced-motion preferences.
 
 1. **Write:** use the original "Small Detours" script, import labeled text, or request a topic-based AI draft.
 2. **Review:** edit the title, dialogue, speakers, delivery, and audience-choice labels.

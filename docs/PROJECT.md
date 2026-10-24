@@ -22,7 +22,7 @@ The scene graph is intentionally fixed: opening -> audience choice -> ending 1 o
 - [x] Stop/cancel, stale-response protection, bounded clip reuse, and explicit errors.
 - [x] Local script save/load/delete and individual MP3 downloads.
 - [x] Labeled browser rehearsal without keys; no provider-success simulation.
-- [x] Earlier phrase studio retained at `/phrase-studio`.
+- [x] Earlier `/phrase-studio` URL redirects to the current studio; saved browser favorites remain untouched.
 - [x] Workers AI full structured scene request returned HTTP 200 after runtime validation.
 - [ ] Actual Fish listening verification by the operator; Gemini drafting remains unavailable with current tested configuration.
 

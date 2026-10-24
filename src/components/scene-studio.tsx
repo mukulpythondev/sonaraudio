@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ArrowDownToLine, ArrowRight, AudioLines, Check, Coffee, Flame, Headphones, LoaderCircle, Play, RotateCcw, Save, Square } from "lucide-react";
+import { ArrowDownToLine, ArrowRight, AudioLines, Check, Coffee, Flame, Headphones, LoaderCircle, Play, Save, Square } from "lucide-react";
 import { clipKey, ENVIRONMENTS, ORIGINAL_SCENE, parseScene, type Environment, type Scene, type SceneLine, type SceneSpeech } from "@/lib/scene";
 import { TONES, isTone, textError } from "@/lib/speech";
 import { CAST, SceneSet } from "./scene-set";
+import { parseLabeledScript } from "@/lib/script-import";
 import { TextImport } from "./text-import";
 import { AudioImport } from "./audio-import";
 import "./scene-studio.css";
@@ -22,6 +23,9 @@ export function SceneStudio({ fishReady, fishMessage, draftReady, draftMessage, 
   const [environment, setEnvironment] = useState<Environment>("studio");
   const [preview, setPreview] = useState(!fishReady);
   const [topic, setTopic] = useState("Should algorithms plan our whole day?");
+  const [scriptSource, setScriptSource] = useState<"write" | "generate" | "upload" | "example">("write");
+  const [pastedScript, setPastedScript] = useState("");
+  const [pasteError, setPasteError] = useState<string | null>(null);
   const [editorBranch, setEditorBranch] = useState<number | null>(null);
   const [chosen, setChosen] = useState<number | null>(null);
   const [awaiting, setAwaiting] = useState(false);
@@ -216,14 +220,51 @@ export function SceneStudio({ fishReady, fishMessage, draftReady, draftMessage, 
       <a className="skip-link" href="#scene-editor">Skip to script</a>
       <header className="topbar">
         <Link className="brand" href="/" aria-label="SonarAudio home"><span className="brand-mark"><AudioLines size={23} /></span><span>Sonar<span className="brand-light">Audio</span>.</span></Link>
-        <nav className="header-actions" aria-label="Studio navigation"><span className="connection-pill"><span className="status-dot" />{preview ? "Browser rehearsal" : "Drama 3 configured"}</span><Link className="help-link" href="/phrase-studio">Phrase studio <ArrowRight size={15} /></Link></nav>
+        <nav className="header-actions" aria-label="Studio navigation"><a className="help-link" href="#scene-editor">Script editor</a><a className="help-link" href="#scene-preview">Audio preview</a><span className="connection-pill"><span className="status-dot" />{preview ? "Rehearsal mode" : "Fish voices configured"}</span></nav>
       </header>
       <main>
         <section className="scene-hero">
-          <div><p className="eyebrow">TWO VOICES / ONE CONVERSATION / YOUR NEXT TURN</p><h1>Same conversation.<br /><span>A different atmosphere.</span></h1>
-            <p className="hero-description">Direct a two-character podcast. Let the audience choose where it goes.</p></div>
-          <div className="scene-edition"><span>SONARAUDIO SCENES / 001</span><p>Written or imported by you.<br />Or drafted with AI.<br />Performed by Fish.</p></div>
+          <div><p className="eyebrow">THE TWO-VOICE AUDIO STUDIO</p><h1>Great conversations.<br /><span>Made by you.</span></h1>
+            <p className="hero-description">Turn a script into expressive audio with two distinct hosts. Set the delivery. Choose the next turn.</p>
+            <div className="creator-actions"><a className="primary-button" href="#scene-editor">Create your scene <ArrowRight size={17} /></a><a className="creator-secondary" href="#script-imports" onClick={() => setScriptSource("upload")}>Import a script</a></div></div>
+          <div className="scene-edition"><span>PROJECT OVERVIEW</span><strong>{scene.intro.length} opening lines</strong><p><span>Cast voices <b>02</b></span><span>Alternative endings <b>02</b></span><span>Performance settings <b>03</b></span></p><small>Local workspace. Save your script to keep it; download audio takes separately.</small></div>
         </section>
+        <div className="creator-workflow" aria-label="Creation workflow"><span><b>01</b> Write or import</span><span><b>02</b> Direct the delivery</span><span><b>03</b> Listen &amp; choose</span></div>
+        <section id="script-imports" className="script-start source-workspace" aria-labelledby="script-start-heading">
+          <p className="step-label">01 / START YOUR SCRIPT</p>
+          <h2 id="script-start-heading">What would you like to create?</h2>
+          <p>Bring your words, start with an idea, or try our example. Your current script stays unchanged until you apply a new one.</p>
+          <div className="source-picker" role="group" aria-label="Script starting point">
+            {(["write", "upload", "generate", "example"] as const).map((source) => <button key={source} aria-pressed={scriptSource === source} aria-controls="script-source-panel" onClick={() => setScriptSource(source)}><strong>{source === "write" ? "Write or paste" : source === "generate" ? "Generate with AI" : source === "upload" ? "Upload a script" : "Try an example"}</strong><small>{source === "write" ? "Your words, your way" : source === "generate" ? "Turn a prompt into dialogue" : source === "upload" ? "Import a labeled .txt file" : "Explore a ready-made scene"}</small></button>)}
+          </div>
+          <div id="script-source-panel" className="source-panel" key={scriptSource} aria-label={`${scriptSource} script source`}>
+            {scriptSource === "write" && <div className="paste-source">
+              <label className="phrase-label" htmlFor="paste-script">Write or paste your two-speaker dialogue</label>
+              <textarea id="paste-script" value={pastedScript} onChange={(event) => setPastedScript(event.target.value)} placeholder={"Speaker 1: Fish Audio क्या है?\nSpeaker 2: इससे हम टेक्स्ट से आवाज़ बना सकते हैं।"} aria-describedby="paste-hint" />
+              <p id="paste-hint">Label turns Speaker 1: and Speaker 2:. Hindi and English work. Up to 40 lines after splitting; your two endings are kept for you to edit. No AI request is made.</p>
+              <button className="primary-button" disabled={!pastedScript.trim() || writing} onClick={() => {
+                try { const lines = parseLabeledScript(pastedScript); setPasteError(null); importOpening(lines); }
+                catch (cause) { setPasteError(cause instanceof Error ? cause.message : "Could not read your dialogue."); }
+              }}>Use this script <ArrowRight size={16} /></button>
+              {pasteError && <p role="alert">{pasteError}</p>}
+            </div>}
+            {scriptSource === "generate" && <div className="topic-form">
+              <label htmlFor="topic">Describe the conversation you want</label>
+              <div><input id="topic" value={topic} maxLength={200} placeholder="Two friends discussing AI over chai, in Hindi" onChange={(event) => setTopic(event.target.value)} disabled={writing} /><button className="primary-button" disabled={!draftReady || writing || !topic.trim()} onClick={() => void generateScript()}>{writing ? <LoaderCircle size={17} className="spin" /> : <ArrowRight size={17} />}Generate script</button></div>
+              <small>{draftReady ? "Creates an opening and two endings. Review and edit before generating voices. This uses one AI drafting request." : draftMessage}</small>
+              <details className="provider-details"><summary>AI provider details</summary><p>{draftProvider} / {draftModel}. Generates text, not audio.</p></details>
+            </div>}
+            {scriptSource === "upload" && <><TextImport expanded onImport={importOpening} /><details className="advanced-import"><summary>Audio import availability</summary><AudioImport ready={audioReady} message={audioMessage} onImport={importOpening} /></details></>}
+            {scriptSource === "example" && <div className="example-source"><span className="example-label">SAMPLE CONVERSATION</span><h4>Would you take the scenic route?</h4><p>Akshat and Priyanshu talk about algorithms, chai, and unexpected turns. Four opening lines and two endings, ready to edit.</p><button className="primary-button" disabled={writing} onClick={() => {
+              if (window.confirm("Load the example and replace your current script?")) {
+                changeScene(structuredClone(ORIGINAL_SCENE)); setEditorBranch(null); setStatus("Example loaded. Edit the dialogue below or play the opening.");
+              }
+            }}>Load example <ArrowRight size={16} /></button><small>The editor starts with this sample. Loading it again replaces your current edits.</small></div>}
+          </div>
+        </section>
+        <section className="production-stage" aria-label="Scene direction">
+        <div className="direction-controls">
+        <div className="set-section-heading"><div><p className="step-label">SCENE DIRECTION</p><h2>Find your setting.</h2></div><p>A different delivery, without rewriting your words.</p></div>
         <div className="scene-settings" role="group" aria-label="Performance environment">
           {ENVIRONMENTS.map((setting, index) => {
             const Icon = [Headphones, Coffee, Flame][index];
@@ -233,22 +274,21 @@ export function SceneStudio({ fishReady, fishMessage, draftReady, draftMessage, 
             }}><Icon size={20} /><span><strong>{setting.name}</strong><small>{setting.subtitle}</small></span>{environment === setting.id && <Check size={17} />}</button>;
           })}
         </div>
+        <p className="direction-note">Akshat and Priyanshu are your two cast voices. Choose each line&apos;s tone in the script editor below.</p>
+        </div>
         <SceneSet environment={environment} activeSpeaker={activeSpeaker} rehearsal={preview} />
-        <div className="scene-disclosure"><p>{preview ? "Browser rehearsal: no Fish voices, emotion, or environment rendering." : "Drama 3 changes the vocal performance. Settings do not add ambience, reverb, or background sounds."}</p>
-          {fishReady && <button className="text-button" onClick={() => { stop(); setPreview(!preview); setAwaiting(false); }}>Use {preview ? "Drama 3" : "browser rehearsal"}</button>}
-          {!fishReady && <details><summary>Configure two voices</summary><p>{fishMessage}</p></details>}
+        </section>
+        <div className="scene-disclosure"><p>{preview ? "Rehearsal mode: ordinary browser speech, not Fish voices or expressive delivery." : "Powered by Fish Audio. Settings direct the voices; they do not add background sounds."}</p>
+          <details className="playback-options"><summary>Playback settings</summary>
+            <p>Fish Audio generates the two expressive voices. Browser rehearsal checks the words without Fish requests; it cannot reproduce the cast or their delivery.</p>
+            {fishReady ? <button className="text-button" onClick={() => { stop(); setPreview(!preview); setAwaiting(false); }}>Switch to {preview ? "Fish Audio" : "browser rehearsal"}</button> : <p>{fishMessage}</p>}
+          </details>
         </div>
 
         <div className="scene-grid">
           <section id="scene-editor" className="scene-editor">
-            <div className="section-heading"><div><p className="step-label">01 / SCRIPT DESK</p><h2>The conversation</h2></div><span className="scene-credit">{speakers.a} / A &nbsp; {speakers.b} / B</span></div>
-            <div className="topic-form">
-              <label htmlFor="topic">Start from a topic</label>
-              <div><input id="topic" value={topic} maxLength={200} onChange={(event) => setTopic(event.target.value)} disabled={writing} /><button className="primary-button" disabled={!draftReady || writing} onClick={() => void generateScript()}>{writing ? <LoaderCircle size={17} className="spin" /> : <ArrowRight size={17} />}Draft scene</button></div>
-              <small>{draftReady ? `${draftProvider} / ${draftModel} drafts text only. Review before generating speech.` : draftMessage}</small>
-            </div>
-            <TextImport onImport={importOpening} />
-            <AudioImport ready={audioReady} message={audioMessage} onImport={importOpening} />
+            <div className="section-heading"><div><p className="step-label">01 / SCRIPT</p><h2>Make it your conversation</h2></div><span className="scene-credit">{scene.intro.length} opening lines</span></div>
+            <div className="editor-intro"><h3>Edit your script</h3><p>Choose a host and delivery for each line. Opening and endings are separate sections.</p></div>
             <label className="phrase-label" htmlFor="scene-title">Scene title</label>
             <input id="scene-title" className="scene-title" value={scene.title} maxLength={80} disabled={writing} onChange={(event) => changeScene({ ...scene, title: event.target.value })} />
             <div className="script-tabs" role="group" aria-label="Script section">
@@ -281,14 +321,13 @@ export function SceneStudio({ fishReady, fishMessage, draftReady, draftMessage, 
                 </li>;
               })}
             </ol>
-            <div className="script-tools"><button onClick={saveScript} disabled={writing}><Save size={16} />{hasSaved ? "Save again" : "Save script"}</button><button onClick={loadScript} disabled={writing}>Load saved</button><button disabled={writing} onClick={() => {
-              if (window.confirm("Replace current edits with the original sample script?")) { changeScene(structuredClone(ORIGINAL_SCENE)); setEditorBranch(null); }
-            }}><RotateCcw size={15} />Original script</button></div>
+            <div className="script-tools"><button onClick={saveScript} disabled={writing}><Save size={16} />{hasSaved ? "Save again" : "Save script"}</button><button onClick={loadScript} disabled={writing}>Load saved</button></div>
           </section>
 
-          <aside className="scene-listening">
+          <aside id="scene-preview" className="scene-listening">
             <section className="listening-panel">
-              <p className="card-kicker">02 / LISTENING ROOM</p><h2>{scene.title || "Untitled conversation"}</h2>
+              <p className="card-kicker">02 / YOUR PREVIEW</p><h2>{scene.title || "Untitled conversation"}</h2>
+              <p className="preview-setting">{ENVIRONMENTS.find((item) => item.id === environment)?.name} / {scene.intro.length} opening lines</p>
               <div className="cast-list"><div><span className="speaker-avatar speaker-a">A</span><span>{speakers.a}<small>Curious host</small></span></div><div><span className="speaker-avatar speaker-b">B</span><span>{speakers.b}<small>Playful counterpoint</small></span></div></div>
               <div className="scene-route"><span>Opening</span><i /><span>Audience choice</span><i /><span>Two possible endings</span></div>
               <button className="primary-button opening-button" disabled={writing || busy} onClick={() => { setChosen(null); void playLines(scene.intro, "intro", true); }}><Play size={17} />{busy ? "Performing..." : preview ? "Rehearse opening" : "Play opening"}</button>

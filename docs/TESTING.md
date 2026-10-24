@@ -2,6 +2,18 @@
 
 ## SonarAudio Scenes verification
 
+### Direct input and source-first layout
+
+Write/Paste is now the default, alongside Upload, Generate, and Example. Browser checks confirmed source setup precedes the stage in DOM order, typed Hindi dialogue survives source switching, applying it creates the correct two mapped opening lines, and the AI prompt field appears only under Generate. No horizontal overflow was observed at desktop, 375px and 320px. Lint, types, 133 tests and production build passed. The Hindi example file is included under `examples/`. No provider requests were made during these checks.
+
+### Script starting-point flow and motion
+
+Generate with AI, Upload a script, and Try an example now expose one source panel at a time. Browser checks confirmed that moving between all three preserved edited dialogue, only the relevant input was visible, and the rehearsal switch remained hidden under Playback settings by default. Desktop, 375px and 320px checks found no horizontal overflow. Emulating reduced motion yielded `animation-name: none` on the source panel. All 133 tests, lint, typecheck and production build passed; no provider calls were made for these UI checks.
+
+### Product workspace redesign, 24 October 2026
+
+The legacy `/phrase-studio` route now returns HTTP 307 to `/`; its navigation link was removed without deleting browser favorites. The scene UI uses neutral panels, indigo actions, sans-serif typography, a side-by-side direction/set stage, and a dedicated script/preview workspace. Browser checks confirmed setting switching, editing retained across section tabs, two-line ending display, and no horizontal page overflow at desktop, 375px and 320px. Lint, typecheck, all 133 tests, and production build passed. No provider requests were made for this redesign. Earlier screenshots show the pre-redesign interface.
+
 ### Cloudflare and script import verification, 24 October 2026
 
 - Saved canonical Cloudflare credentials were present. A minimal Workers AI inference returned HTTP 200 and the requested OK response; this establishes inference access, independently of token verification.
