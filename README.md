@@ -89,6 +89,7 @@ When either Cloudflare credential is configured, **Workers AI takes precedence**
 - Label turns `Speaker 1:` / `Speaker 2:` (also `Speak 1/2`, `A/B`, `Akshat/Priyanshu`). Unlabeled continuation lines belong to the previous turn. Unknown speaker labels are rejected rather than guessed.
 - Review before replacing the opening. Long turns split at word boundaries into lines of up to 280 characters, with a maximum of 40 opening lines. Imported lines start with warm delivery.
 - Both endings remain unchanged and must be reviewed for relevance. Save the imported scene explicitly if you want it to survive refresh.
+- After selecting a valid file, click the prominent **Use uploaded script** button above the text preview and confirm replacement. Selecting a file alone does not update the editor.
 - **Audio import is unavailable in this build.** Cloudflare documents Nova-3 diarization, but the public REST transport for binary audio plus diarization options could not be verified. The UI explains the limitation and disables upload; no paid transcription requests are guessed. Transcript parsing and speaker-mapping helpers are tested scaffolding, not a working transcription feature.
 
 ## Implemented workflow

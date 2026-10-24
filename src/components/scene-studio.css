@@ -39,6 +39,10 @@
 .script-import button { margin: 10px 8px 0 0; min-height: 44px; }
 .script-import select { min-height: 44px; max-width: 100%; }
 .script-import [role="alert"] { color: #9b3824; font-weight: 600; }
+.upload-apply { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px; margin-top: 18px; border: 1px solid #b6c0ef; background: #f0f3ff; border-radius: 8px; }
+.upload-apply strong { font-size: 14px; }.script-import .upload-apply p { margin: 6px 0 0; font-size: 12px; }
+.script-import .upload-apply button { flex-shrink: 0; margin: 0; }
+@media (max-width: 760px) { .upload-apply { align-items: stretch; flex-direction: column; gap: 14px; }.upload-apply button { width: 100%; } }
 .performance-set { --set-wall: #344541; background: #24332f; color: #f4eee1; margin-top: 22px; border: 1px solid #58665b; border-radius: 4px; overflow: hidden; }
 .performance-set.set-cafe { --set-wall: #d4bea0; background: #eee2cc; color: #342d23; border-color: #a18d72; }
 .performance-set.set-campfire { --set-wall: #16272c; background: #1c302f; color: #f4eee1; border-color: #53665e; }
